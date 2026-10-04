@@ -23,11 +23,7 @@ def remove_bots(user_ids: list[str], bots: set[str]) -> list[str]:
     Пример:
         remove_bots(["anna", "bot_1", "oleg"], {"bot_1"}) -> ["anna", "oleg"]
     """
-    # Проходим по списку и удаляем ботов.
-    for user_id in user_ids:
-        if user_id in bots:
-            user_ids.remove(user_id)
-    return user_ids
+    return [user_id for user_id in user_ids if user_id not in bots]
 
 
 def last_events(log_text: str, n: int) -> list[str]:
@@ -41,13 +37,8 @@ def last_events(log_text: str, n: int) -> list[str]:
         last_events("10:00 login\\n10:05 click\\n10:07 export", 2)
         -> ["10:05 click", "10:07 export"]
     """
-    # Разбиваем текст на строки и отбрасываем пустые.
-    lines = []
-    for line in log_text.split("/n"):
-        if line:
-            lines.append(line)
-    # Последние n строк - срез с конца.
-    return lines[-n:]
+    lines = [line for line in log_text.splitlines() if line]
+    return lines[-n:] if n > 0 else []
 
 
 def unique_domains(emails: list[str]) -> int:
@@ -59,11 +50,7 @@ def unique_domains(emails: list[str]) -> int:
     Пример:
         unique_domains(["anna@mail.ru", "oleg@mail.ru", "ivan@gmail.com"]) -> 2
     """
-    # Множество само уберёт повторы.
-    domains = set()
-    for email in emails:
-        domains.add(email.split("@")[0])
-    return len(domains)
+    return len({email.split("@")[1].lower() for email in emails})
 
 
 def backoff_delays(first_delay: int, max_delay: int) -> list[int]:
@@ -79,7 +66,7 @@ def backoff_delays(first_delay: int, max_delay: int) -> list[int]:
     delays = []
     delay = first_delay
     # Удваиваем паузу, пока не дошли до максимума.
-    while delay < max_delay:
+    while delay <= max_delay:
         delays.append(delay)
         delay = delay * 2
     return delays
